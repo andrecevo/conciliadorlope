@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conciliação Geral · Lope</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<style>
+:root{--navy:#072758;--orange:#FF7100;--orangeH:#e66600;--cyan:#1382B1;--bg:#f2f4f8;--line:#dfe4ec;--line2:#edf0f5;--ink:#1d2433;--ink2:#4f5b6b;--ink3:#69727d;--ok:#0f7b3f;--okS:#e6f4ec;--bad:#b42318;--badS:#fdeceb;--warn:#a15c00;--warnS:#fdf1dc}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font:14px/1.45 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font:inherit;font-weight:600;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;background:var(--orange);color:#fff}button:hover{background:var(--orangeH)}button:disabled{opacity:.6;cursor:default}
+button.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}button.sec:hover{border-color:#b9c3d3}
+button.link{background:none;color:var(--cyan);padding:0;font-weight:500}button.link:hover{text-decoration:underline;background:none}
+input,select,textarea{font:inherit;width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(19,130,177,.35);border-color:var(--cyan)}
+label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin:12px 0 5px}
+.msg{font-size:13px;border-radius:10px;padding:9px 12px;margin-top:12px;display:none}.msg.err{display:block;background:var(--badS);color:var(--bad)}.msg.ok{display:block;background:var(--okS);color:var(--ok)}
+
+body{background:radial-gradient(120% 120% at 50% 110%, #1382B1 0%, #0b3a78 45%, #072758 78%);display:flex;align-items:center;justify-content:center;padding:30px 16px}
+.box{width:100%;max-width:420px}
+.brand{display:flex;align-items:center;gap:16px;color:#fff;margin-bottom:18px}
+.brand img{height:34px}.brand .sep{width:1px;height:38px;background:rgba(255,255,255,.25)}
+.brand h1{margin:0;font-size:21px;font-weight:800;letter-spacing:-.02em}.brand p{margin:2px 0 0;font-size:12px;color:rgba(255,255,255,.75)}
+.card{background:#fff;border-radius:16px;padding:24px 24px 22px;box-shadow:0 20px 50px rgba(3,15,40,.35)}
+.card h2{margin:0 0 4px;font-size:17px;font-weight:800;color:var(--navy)}.card .sub{color:var(--ink3);font-size:13px;margin:0 0 6px}
+.row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px}
+.full{width:100%;margin-top:18px}
+.foot{color:rgba(255,255,255,.65);font-size:12px;text-align:center;margin-top:16px}
+.view{display:none}.view.on{display:block}
+.loading{color:#fff;text-align:center;font-size:14px}
+</style></head>
+<body>
+<div class="box">
+  <div class="brand"><img src="data:image/png;base64,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" alt="LOPE"><span class="sep"></span><div><h1>Conciliação Geral</h1><p>Checkouts × extratos de liquidação, por marca</p></div></div>
+
+  <div class="card view" id="vLogin">
+    <h2>Entrar</h2><p class="sub">Use o seu e-mail e a sua senha.</p>
+    <form id="fLogin">
+      <label for="lu">E-mail</label><input id="lu" type="email" autocomplete="username" required>
+      <label for="ls">Senha</label><input id="ls" type="password" autocomplete="current-password" required>
+      <button class="full" id="bLogin">Entrar</button>
+    </form>
+    <div class="msg" id="mLogin"></div>
+    <div class="row"><button class="link" data-go="vSol">Solicitar acesso</button><button class="link" data-go="vEsq">Esqueci a senha</button></div>
+  </div>
+
+  <div class="card view" id="vSol">
+    <h2>Solicitar acesso</h2><p class="sub">O pedido vai para aprovação. Quando for aprovado, você recebe o link para criar a sua senha.</p>
+    <form id="fSol">
+      <label for="sn">Nome completo</label><input id="sn" required>
+      <label for="se">E-mail</label><input id="se" type="email" required>
+      <label for="sa">Área</label><input id="sa" placeholder="Ex.: Financeiro, Comercial">
+      <label for="sm">Motivo</label><textarea id="sm" rows="2" placeholder="Para que você vai usar a conciliação?"></textarea>
+      <button class="full" id="bSol">Enviar pedido</button>
+    </form>
+    <div class="msg" id="mSol"></div>
+    <div class="row"><button class="link" data-go="vLogin">← Voltar para o login</button></div>
+  </div>
+
+  <div class="card view" id="vEsq">
+    <h2>Esqueci a senha</h2><p class="sub">Informe o seu e-mail. Se ele tiver acesso, você recebe um link para criar uma senha nova.</p>
+    <form id="fEsq">
+      <label for="ee">E-mail</label><input id="ee" type="email" required>
+      <button class="full" id="bEsq">Enviar link</button>
+    </form>
+    <div class="msg" id="mEsq"></div>
+    <div class="row"><button class="link" data-go="vLogin">← Voltar para o login</button></div>
+  </div>
+
+  <div class="card view" id="vSenha">
+    <h2 id="tSenha">Crie a sua senha</h2><p class="sub" id="sSenha">Escolha uma senha com pelo menos 8 caracteres.</p>
+    <form id="fSenha">
+      <label for="tn">Nova senha</label><input id="tn" type="password" autocomplete="new-password" minlength="8" required>
+      <label for="tc">Confirme a nova senha</label><input id="tc" type="password" autocomplete="new-password" minlength="8" required>
+      <button class="full" id="bSenha">Salvar e entrar</button>
+    </form>
+    <div class="msg" id="mSenha"></div>
+  </div>
+
+  <div class="view loading on" id="vLoad">Abrindo a Conciliação…</div>
+  <div class="foot">LOPE · Vender é arte. Operar é Lope.</div>
+</div>
+<script>
+(function(){
+'use strict';
+const C = window.CG_CONFIG || {};
+const $ = s => document.querySelector(s);
+const show = id => { document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on', v.id===id)); };
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+const msg = (id,t,ok) => { const m=$(id); m.textContent=t; m.className='msg '+(ok?'ok':'err'); };
+if(!C.SUPABASE_URL || /COLE_AQUI/.test(C.SUPABASE_URL) || !window.supabase){ show('vLogin'); msg('#mLogin','O site ainda não foi ligado ao Supabase (config.js).'); return; }
+
+// tipo do link que trouxe a pessoa até aqui (convite ou senha nova), lido antes do Supabase limpar o endereço
+window.addEventListener('hashchange', ()=>{ if(/access_token=|error_description=/.test(location.hash)) location.reload(); });
+const H = new URLSearchParams(location.hash.slice(1));
+const tipoLink = H.get('type');
+const erroLink = H.get('error_description');
+const sb = window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, {auth:{flowType:'implicit', detectSessionInUrl:true, persistSession:true, autoRefreshToken:true}});
+let modoSenha = (tipoLink==='invite' || tipoLink==='recovery') ? tipoLink : '';
+sb.auth.onAuthStateChange(ev => { if(ev==='PASSWORD_RECOVERY'){ modoSenha='recovery'; telaSenha(); } });
+
+async function fn(nome, body){
+  const { data, error } = await sb.functions.invoke(nome, { body });
+  if(error){ let m=error.message; try{ const j=await error.context.json(); m=j.erro||m; }catch(e){} throw new Error(m); }
+  if(!data || !data.ok) throw new Error((data&&data.erro)||'Erro no servidor');
+  return data;
+}
+function telaSenha(){
+  $('#tSenha').textContent = modoSenha==='invite' ? 'Bem-vindo! Crie a sua senha' : 'Crie uma senha nova';
+  show('vSenha'); history.replaceState(null,'',location.pathname+location.search);
+}
+async function perfilOk(session){
+  const { data:p, error } = await sb.from('perfis').select('nome,papel,ativo').eq('id', session.user.id).maybeSingle();
+  if(error) throw new Error(error.message);
+  if(!p || !p.ativo){ await sb.auth.signOut(); show('vLogin'); msg('#mLogin','O seu acesso não está ativo. Fale com um administrador.'); return false; }
+  sb.rpc('registrar_acesso').then(()=>{}, ()=>{});
+  return true;
+}
+async function abrir(){
+  const volta = sessionStorage.getItem('cg_volta');
+  if(volta){ sessionStorage.removeItem('cg_volta'); location.href=volta; return; }
+  show('vLoad');
+  try{
+    const [{data:k,error}, enc] = await Promise.all([ sb.from('app_segredo').select('chave').maybeSingle(), fetch('app.enc?v='+Date.now(),{cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('app.enc não encontrado'); return r.text(); }) ]);
+    if(error || !k) throw new Error(error ? error.message : 'chave do sistema não configurada no Supabase');
+    const [iv, ct] = enc.trim().split('.').map(x=>Uint8Array.from(atob(x), c=>c.charCodeAt(0)));
+    const key = await crypto.subtle.importKey('raw', Uint8Array.from(atob(k.chave), c=>c.charCodeAt(0)), 'AES-GCM', false, ['decrypt']);
+    const html = new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct));
+    localStorage.setItem('cg_sb', JSON.stringify({url:C.SUPABASE_URL, key:C.SUPABASE_ANON_KEY}));
+    sb.auth.stopAutoRefresh();
+    document.open(); document.write(html); document.close();
+  }catch(e){ show('vLogin'); msg('#mLogin','Não foi possível abrir: '+e.message); }
+}
+
+$('#fLogin').onsubmit = async e => {
+  e.preventDefault(); const b=$('#bLogin'); b.disabled=true; b.textContent='Entrando…';
+  try{
+    const { data, error } = await sb.auth.signInWithPassword({ email:$('#lu').value.trim(), password:$('#ls').value });
+    if(error){ msg('#mLogin', /invalid/i.test(error.message)?'E-mail ou senha incorretos.':/banned/i.test(error.message)?'O seu acesso está desativado.':error.message); return; }
+    if(await perfilOk(data.session)) abrir();
+  }catch(err){ msg('#mLogin', err.message); }
+  finally{ b.disabled=false; b.textContent='Entrar'; }
+};
+$('#fSenha').onsubmit = async e => {
+  e.preventDefault();
+  if($('#tn').value!==$('#tc').value){ msg('#mSenha','As duas senhas não são iguais.'); return; }
+  const b=$('#bSenha'); b.disabled=true;
+  try{
+    const { error } = await sb.auth.updateUser({ password:$('#tn').value });
+    if(error){ msg('#mSenha', /different/i.test(error.message)?'A senha nova precisa ser diferente da anterior.':error.message); return; }
+    const { data:{ session } } = await sb.auth.getSession();
+    modoSenha=''; if(await perfilOk(session)) abrir();
+  }catch(err){ msg('#mSenha',err.message); } finally{ b.disabled=false; }
+};
+$('#fSol').onsubmit = async e => {
+  e.preventDefault(); const b=$('#bSol'); b.disabled=true; b.textContent='Enviando…';
+  try{ await fn('acesso-publico',{acao:'solicitar', nome:$('#sn').value, email:$('#se').value, area:$('#sa').value, motivo:$('#sm').value});
+    msg('#mSol','Pedido enviado. O administrador vai analisar e te mandar o link de acesso.',true); $('#fSol').reset(); }
+  catch(err){ msg('#mSol',err.message); } finally{ b.disabled=false; b.textContent='Enviar pedido'; }
+};
+$('#fEsq').onsubmit = async e => {
+  e.preventDefault(); const b=$('#bEsq'); b.disabled=true;
+  try{ await fn('acesso-publico',{acao:'esqueci', email:$('#ee').value}); msg('#mEsq','Pronto. Se o e-mail tiver acesso, o link chega em alguns minutos (confira o spam). Se não chegar, peça a um administrador o link de senha nova.',true); }
+  catch(err){ msg('#mEsq',err.message); } finally{ b.disabled=false; }
+};
+
+(async()=>{
+  if(erroLink){ show('vLogin'); msg('#mLogin', /expired|invalid/i.test(erroLink)?'Esse link expirou ou já foi usado. Peça um novo em "Esqueci a senha".':erroLink); history.replaceState(null,'',location.pathname); return; }
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session && modoSenha){ telaSenha(); return; }
+  if(session){ try{ if(await perfilOk(session)) abrir(); }catch(e){ show('vLogin'); msg('#mLogin',e.message); } return; }
+  show('vLogin');
+})();
+})();
+</script>
+</body></html>
